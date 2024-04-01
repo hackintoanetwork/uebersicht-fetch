@@ -1,6 +1,3 @@
 # Fetch-Übersicht
 
-Shows stats such as system, network and weather information on your desktop. Requires Übersicht.
-Most scripts are based on neofetch. Requires OpenWeatherMap API key for weather.
-
-![Screenshot](screenshot-1.png?raw=true)
+Tested on `macOS 14.4.1 23E224 arm64`
