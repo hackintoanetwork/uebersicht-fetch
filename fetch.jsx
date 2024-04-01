@@ -1,24 +1,11 @@
 import { run } from "uebersicht";
 
-const opwmApiKey = "";
-
-/**
- * OpenWeatherMaps accepts three parameters here:
- * 
- * kelvin
- * imperial
- * metric
- * 
- * Default is: kelvin
- */
-const units = "";
-
 const opacity = "cc";
 const color = "#ffffff" + opacity;
-const tintColor = "#e08201" + opacity;
+const tintColor = "#6e27f2" + opacity;
 
 export const className = `
-    bottom: 0;
+    bottom: 68%;
     left: 0;
     box-sizing: border-box;
     margin: auto;
@@ -43,12 +30,10 @@ export const render = ({
     packages,
     memory,
     battery,
-    date,
     localIp,
     mac,
     ssid,
     routerIp,
-    weather,
 }) => {
     const SystemSection = () => (
         <div id="system">
@@ -103,29 +88,6 @@ export const render = ({
         </div>
     );
 
-    const WeatherSection = () => (
-        <div id="weather">
-            <div>
-                <b>
-                    │<br />├ Date:{" "}
-                </b>
-                {date}
-            </div>
-            <div>
-                <b>│ Location: </b>
-                {weather.city}
-            </div>
-            <div>
-                <b>│ Weather Summary: </b>
-                {weather.conditions}
-            </div>
-            <div>
-                <b>│ Temperature: </b>
-                {weather.temp} °{units=="imperial" ? "F" : units=="kelvin" ? "K" : units=="metric" ? "C" : "K"}
-            </div>
-        </div>
-    );
-
     const NetworkSection = () => (
         <div id="network">
             {" "}
@@ -155,7 +117,6 @@ export const render = ({
             <SystemSection />
             <HardwareSection />
             <NetworkSection />
-            <WeatherSection />
         </div>
     );
 };
@@ -173,7 +134,7 @@ const execute = (action, interval) => {
 
 export const command = async (dispatch) => {
     // Most of the scripts are from https://github.com/dylanaraps/neofetch/blob/master/neofetch
-    run(`./fetch/scripts/runOnce.sh`).then((data) => {
+    run(`./fetch.widget/scripts/runOnce.sh`).then((data) => {
         const splitted = data.split("\n");
         dispatch({
             hostname: splitted[0],
@@ -187,7 +148,7 @@ export const command = async (dispatch) => {
     });
 
     execute(() => {
-        run("./fetch/scripts/runEveryMinute.sh").then((data) => {
+        run("./fetch.widget/scripts/runEveryMinute.sh").then((data) => {
             const splitted = data.split("\n");
             dispatch({
                 uptime: splitted[0],
@@ -200,32 +161,6 @@ export const command = async (dispatch) => {
             });
         });
     }, 1000 * 60);
-
-    // Update weather once in an hour
-    execute(() => fetchWeather(dispatch), 1000 * 60 * 60);
-};
-
-const fetchWeather = (dispatch) => {
-    geolocation.getCurrentPosition((geo) => {
-        const lat = geo.position.coords.latitude;
-        const lon = geo.position.coords.longitude;
-
-        fetch(
-            `http://127.0.0.1:41417/https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${opwmApiKey}&lang=en`
-        )
-            .then((res) => res.json())
-            .then((data) => {
-                let captalizeWord = text => text.toLowerCase().split(' ').map( (i, j) => i.charAt(0).toUpperCase()+i.slice(1)).join(' ')
-
-                return dispatch({
-                    weather: {
-                        conditions: captalizeWord(data.weather[0].description),
-                        temp: data.main.temp,
-                        city: data.name,
-                    },
-                });
-            });
-    });
 };
 
 export const refreshFrequency = false;

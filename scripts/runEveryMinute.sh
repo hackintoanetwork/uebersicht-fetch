@@ -75,3 +75,4 @@ netstat -rn | grep default | grep en0 | grep -o '[0-9]*\.[0-9]*\.[0-9]*\.[0-9]'
 
 # Wifi name
 /System/Library/PrivateFrameworks/Apple80211.framework/Resources/airport -I  | awk -F' SSID: '  '/ SSID: / {print $2}'
+networksetup -getairportnetwork en0 | awk -F': ' '{print $2}'
